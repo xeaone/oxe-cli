@@ -1,8 +1,10 @@
 {
 	"name": "oxe-cli",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "Oxe command line interface program for Oxe applications.",
-	"bin": "bin/index.js",
+	"bin": {
+		"oxe": "bin/index.js"
+	},
 	"scripts": {},
 	"repository": {
 		"type": "git",
