@@ -2,9 +2,9 @@
 
 const Cliy = require('cliy');
 const Path = require('path');
+const Bundle = require('./bundle');
+const Compile = require('./compile');
 const Package = require('../package');
-const Bundle = require('../lib/bundle');
-const Compile = require('../lib/compile');
 
 const Program = new Cliy();
 
