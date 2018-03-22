@@ -1,0 +1,28 @@
+{
+	"name": "oxe-cli",
+	"version": "1.0.0",
+	"description": "Oxe command line interface program for Oxe applications.",
+	"bin": "bin/index.js",
+	"scripts": {},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/AlexanderElias/oxe-cli.git"
+	},
+	"author": "Alexander Elias",
+	"license": "MPL-2.0",
+	"bugs": {
+		"url": "https://github.com/AlexanderElias/oxe-cli/issues"
+	},
+	"homepage": "https://github.com/AlexanderElias/oxe-cli#readme",
+	"keywords": [
+		"cli",
+		"oxe"
+	],
+	"dependencies": {
+		"babel-core": "^6.26.0",
+		"babel-plugin-transform-es2015-modules-umd": "^6.24.1",
+		"babel-preset-env": "^1.6.1",
+		"cliy": "^1.4.2",
+		"fsep": "^3.0.1"
+	}
+}
