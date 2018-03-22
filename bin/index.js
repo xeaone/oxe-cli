@@ -47,7 +47,7 @@ const operations = {
 (async function() {
 
 	await Program.setup({
-		name: Package.name,
+		name: 'oxe',
 		version: Package.version,
 		operations: [
 			{
