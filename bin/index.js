@@ -2,11 +2,23 @@
 
 const Cliy = require('cliy');
 const Path = require('path');
+const Serve = require('./serve');
 const Bundle = require('./bundle');
 const Compile = require('./compile');
 const Package = require('../package');
 
 const Program = new Cliy();
+
+const i = async function (argument, values) {
+	const args = argument ? argument.split(' ') : [];
+
+	if (!args[0]) throw new Error('Missing input path parameter');
+
+	values = values || {};
+	values.input = Path.resolve(process.cwd(), args[0]);
+
+	return values;
+};
 
 const io = async function (argument, values) {
 	const args = argument ? argument.split(' ') : [];
@@ -14,6 +26,7 @@ const io = async function (argument, values) {
 	if (!args[0]) throw new Error('Missing input path parameter');
 	if (!args[1]) throw new Error('Missing output path parameter');
 
+	values = values || {};
 	values.input = Path.resolve(process.cwd(), args[0]);
 	values.output = Path.resolve(process.cwd(), args[1]);
 
@@ -46,6 +59,8 @@ const operations = {
 
 (async function() {
 
+	console.log('\nOxe Serving\n');
+
 	await Program.setup({
 		name: 'oxe',
 		version: Package.version,
@@ -53,7 +68,7 @@ const operations = {
 			{
 				key: 'c',
 				name: 'compile',
-				description: 'Compiles project to static files requires a index.html and index.js.',
+				description: 'Compiles to a static project.',
 				operations: [
 					operations.minify,
 					operations.comments,
@@ -62,11 +77,14 @@ const operations = {
 				method: async function (argument, values) {
 					const data = await io(argument, values);
 					await Compile(data);
+					console.log('\nOxe Compiling\n');
+					console.log(`Compiled: from ${data.input} to ${data.output}`);
 				}
 			},
 			{
 				key: 'b',
 				name: 'bundle',
+				description: 'Bundles a project.',
 				operations: [
 					operations.minify,
 					operations.comments,
@@ -82,6 +100,35 @@ const operations = {
 				method: async function (argument, values) {
 					const data = await io(argument, values);
 					await Bundle(data);
+					console.log('\nOxe Bundling\n');
+					console.log(`Bundled: from ${data.input} to ${data.output}`);
+				}
+			},
+			{
+				key: 's',
+				name: 'serve',
+				description: 'Serves a static or spa project.',
+				operations: [
+					{
+						key: 's',
+						name: 'spa',
+						method: function () {
+							return true;
+						}
+					},
+					{
+						key: 'c',
+						name: 'cors',
+						method: function () {
+							return true;
+						}
+					}
+				],
+				method: async function (argument, values) {
+					const data = await i(argument, values);
+					const server = await Serve(data);
+					console.log('\nOxe Serving\n');
+					console.log(`Served: ${server.hostname}:${server.port}`);
 				}
 			}
 		]

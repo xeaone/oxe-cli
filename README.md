@@ -6,20 +6,30 @@ Oxe command line interface program for Oxe applications.
 `npm i -g oxe-cli`
 
 ## CLI
+
 - **Usage**
+
 	- `oxe <operation> [...]`
+
 - **Operations**
+
 - `-h, --help`
 - `-v, --version`
-- `-c, --compile <input> <output>` Static compiles a project.
+
+- `-c, --compile <input> <output>` Compiles to a static project.
 	- `-m, --minify`
 	- `-c, --comment`
 	- `-t, --transpile`
-- `-b, --bundle  <input> <output>` Bundles a project.
+
+- `-b, --bundle <input> <output>` Bundles a project.
 	- `-m, --minify`
 	- `-c, --comment`
 	- `-t, --transpile`
 	- `-n, --name <name>`
+
+- `-s --serve <input>` Serves a static or spa project.
+	- `-s, --spa`
+	- `-c, --cors`
 
 ## Authors
 [AlexanderElias](https://github.com/AlexanderElias)
