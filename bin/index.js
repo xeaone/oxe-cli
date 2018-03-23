@@ -59,8 +59,6 @@ const operations = {
 
 (async function() {
 
-	console.log('\nOxe Serving\n');
-
 	await Program.setup({
 		name: 'oxe',
 		version: Package.version,
