@@ -4,13 +4,24 @@ const Porty = require('porty');
 const Servey = require('servey');
 
 module.exports = async function (data) {
-	const port = await Porty.find(8080);
+	const port = await Porty.find(8000);
 
-	const server = Servey.create({
+	const server = new Servey({
 		port: port,
-		spa: data.spa,
 		cors: data.cors,
-		folder: data.input
+		routes: [
+			{
+				path: '*',
+				method: 'get',
+				handler: async function (context) {
+					return await context.tool.static({
+						spa: data.spa,
+						folder: output || input,
+						path: context.url.pathname
+					});
+				}
+			}
+		]
 	});
 
 	await server.open();
