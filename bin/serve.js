@@ -16,7 +16,7 @@ module.exports = async function (data) {
 				handler: async function (context) {
 					return await context.tool.static({
 						spa: data.spa,
-						folder: output || input,
+						folder: data.input,
 						path: context.url.pathname
 					});
 				}
