@@ -15,6 +15,7 @@ const i = async function (argument, values) {
 	if (!args[0]) throw new Error('Missing input path parameter');
 
 	values = values || {};
+	
 	values.input = Path.resolve(process.cwd(), args[0]);
 
 	return values;
@@ -27,6 +28,7 @@ const io = async function (argument, values) {
 	if (!args[1]) throw new Error('Missing output path parameter');
 
 	values = values || {};
+
 	values.input = Path.resolve(process.cwd(), args[0]);
 	values.output = Path.resolve(process.cwd(), args[1]);
 

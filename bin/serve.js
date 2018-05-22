@@ -9,6 +9,7 @@ module.exports = async function (data) {
 	const server = new Servey({
 		port: port,
 		cors: data.cors,
+		hostname: 'localhost',
 		routes: [
 			{
 				path: '*',

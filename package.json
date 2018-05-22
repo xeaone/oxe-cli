@@ -5,7 +5,9 @@
 	"bin": {
 		"oxe": "bin/index.js"
 	},
-	"scripts": {},
+	"scripts": {
+		"t": "node bin -s test"
+	},
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/AlexanderElias/oxe-cli.git"
@@ -24,7 +26,7 @@
 		"babel-core": "^6.26.3",
 		"babel-plugin-transform-es2015-modules-umd": "^6.24.1",
 		"babel-preset-env": "^1.7.0",
-		"cliy": "^1.4.2",
+		"cliy": "^1.4.3",
 		"fsep": "^3.0.1",
 		"porty": "^3.1.1",
 		"servey": "^3.1.6"
