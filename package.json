@@ -1,6 +1,6 @@
 {
 	"name": "oxe-cli",
-	"version": "1.1.4",
+	"version": "1.1.5",
 	"description": "Oxe command line interface program for Oxe applications.",
 	"bin": {
 		"oxe": "bin/index.js"
@@ -21,9 +21,9 @@
 		"oxe"
 	],
 	"dependencies": {
-		"babel-core": "^6.26.0",
+		"babel-core": "^6.26.3",
 		"babel-plugin-transform-es2015-modules-umd": "^6.24.1",
-		"babel-preset-env": "^1.6.1",
+		"babel-preset-env": "^1.7.0",
 		"cliy": "^1.4.2",
 		"fsep": "^3.0.1",
 		"porty": "^3.1.1",
