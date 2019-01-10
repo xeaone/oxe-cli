@@ -6,7 +6,7 @@
 		"oxe": "bin/index.js"
 	},
 	"scripts": {
-		"t": "node bin -s test"
+		"t": "node bin -s tst"
 	},
 	"repository": {
 		"type": "git",
@@ -28,6 +28,8 @@
 		"babel-preset-env": "^1.7.0",
 		"cliy": "^1.4.3",
 		"fsep": "^3.0.1",
+		"jsdom": "^13.1.0",
+		"oxe": "^4.0.7",
 		"porty": "^3.1.1",
 		"servey": "^3.1.6"
 	}
