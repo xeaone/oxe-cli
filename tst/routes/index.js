@@ -8,6 +8,7 @@ export default {
 			dynamic: 'hello world'
 		},
 		created: function () {
+			console.log('created');
 		},
 		template: `
 			<h2>Index</h2>
