@@ -2,17 +2,15 @@
 <html>
 <head>
 	<title>Test</title>
-
-	<script src="../idea/poly.js"></script>
-	<!-- <script src="../node_modules/oxe/dst/poly.min.js"></script> -->
-	<!-- <script src="../node_modules/oxe/dst/poly.shadow.min.js"></script> -->
-
-	<script src="./oxe.js" defer></script>
-	<script src="./index.js" defer></script>
+	<!-- base tag breaks -->
+	<base href="/">
+	<script src="./oxe.min.js" defer></script>
+	<script src="/index.js" defer></script>
 </head>
 <body>
 
-	<h1>Test</h1>
+	<a href="/">Root</a><br>
+	<a href="/about">About</a><br>
 
 	<o-router></o-router>
 

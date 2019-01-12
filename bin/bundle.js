@@ -1,8 +1,6 @@
-'use strict';
 
 const Fsep = require('fsep');
 const Path = require('path');
-
 const Bundle = require('../lib/bundle');
 
 module.exports = async function (data) {

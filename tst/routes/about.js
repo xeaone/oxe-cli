@@ -5,13 +5,14 @@ export default {
 	component: {
 		name: 'r-about',
 		model: {
-			dynamic: 'hello world'
+			text: 'hello world'
 		},
 		created: function () {
+			console.log('about route created');
 		},
 		template: `
 			<h2>About</h2>
-			<h3 o-text="dynamic"></h3>
+			<h3 o-text="text"></h3>
 		`
 	}
 }

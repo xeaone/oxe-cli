@@ -23,14 +23,13 @@
 		"oxe"
 	],
 	"dependencies": {
-		"babel-core": "^6.26.3",
-		"babel-plugin-transform-es2015-modules-umd": "^6.24.1",
-		"babel-preset-env": "^1.7.0",
 		"cliy": "^1.4.3",
 		"fsep": "^3.0.1",
 		"jsdom": "^13.1.0",
-		"oxe": "^4.0.7",
 		"porty": "^3.1.1",
-		"servey": "^3.1.6"
+		"servey": "^5.2.4"
+	},
+	"devDependencies": {
+		"oxe": "^4.0.8"
 	}
 }

@@ -3,11 +3,9 @@
 const Cliy = require('cliy');
 const Path = require('path');
 const Serve = require('./serve');
-const Bundle = require('./bundle');
+// const Bundle = require('./bundle');
 const Compile = require('./compile');
 const Package = require('../package');
-
-const Program = new Cliy();
 
 const i = async function (argument, values) {
 	const args = argument ? argument.split(' ') : [];
@@ -15,7 +13,7 @@ const i = async function (argument, values) {
 	if (!args[0]) throw new Error('Missing input path parameter');
 
 	values = values || {};
-	
+
 	values.input = Path.resolve(process.cwd(), args[0]);
 
 	return values;
@@ -35,33 +33,33 @@ const io = async function (argument, values) {
 	return values;
 };
 
-const operations = {
-	minify: {
-		key: 'm',
-		name: 'minify',
-		method: function () {
-			return true;
-		}
-	},
-	comments: {
-		key: 'c',
-		name: 'comments',
-		method: function () {
-			return false;
-		}
-	},
-	transpile: {
-		key: 't',
-		name: 'transpile',
-		method: function () {
-			return true;
-		}
-	}
-};
+// const operations = {
+// 	minify: {
+// 		key: 'm',
+// 		name: 'minify',
+// 		method: function () {
+// 			return true;
+// 		}
+// 	},
+// 	comments: {
+// 		key: 'c',
+// 		name: 'comments',
+// 		method: function () {
+// 			return false;
+// 		}
+// 	},
+// 	transpile: {
+// 		key: 't',
+// 		name: 'transpile',
+// 		method: function () {
+// 			return true;
+// 		}
+// 	}
+// };
 
 (async function() {
 
-	await Program.setup({
+	const option = {
 		name: 'oxe',
 		version: Package.version,
 		operations: [
@@ -69,41 +67,43 @@ const operations = {
 				key: 'c',
 				name: 'compile',
 				description: 'Compiles to a static project.',
-				operations: [
-					operations.minify,
-					operations.comments,
-					operations.transpile
-				],
+				// operations: [
+					// operations.minify,
+					// operations.comments,
+					// operations.transpile
+				// ],
 				method: async function (argument, values) {
 					const data = await io(argument, values);
+
 					await Compile(data);
-					console.log('\nOxe Compiling\n');
-					console.log(`Compiled: from ${data.input} to ${data.output}`);
+
+					console.log(`\nOxe - Compiling`);
+					console.log(`\nOxe - Compiled: from ${data.input} to ${data.output}`);
 				}
 			},
-			{
-				key: 'b',
-				name: 'bundle',
-				description: 'Bundles a project.',
-				operations: [
-					operations.minify,
-					operations.comments,
-					operations.transpile,
-					{
-						key: 'n',
-						name: 'name',
-						method: function (name) {
-							return name;
-						}
-					}
-				],
-				method: async function (argument, values) {
-					const data = await io(argument, values);
-					await Bundle(data);
-					console.log('\nOxe Bundling\n');
-					console.log(`Bundled: from ${data.input} to ${data.output}`);
-				}
-			},
+			// {
+			// 	key: 'b',
+			// 	name: 'bundle',
+			// 	description: 'Bundles a project.',
+			// 	operations: [
+			// 		operations.minify,
+			// 		operations.comments,
+			// 		operations.transpile,
+			// 		{
+			// 			key: 'n',
+			// 			name: 'name',
+			// 			method: function (name) {
+			// 				return name;
+			// 			}
+			// 		}
+			// 	],
+			// 	method: async function (argument, values) {
+			// 		const data = await io(argument, values);
+			// 		await Bundle(data);
+			// 		console.log('\nOxe Bundling\n');
+			// 		console.log(`Bundled: from ${data.input} to ${data.output}`);
+			// 	}
+			// },
 			{
 				key: 's',
 				name: 'serve',
@@ -132,10 +132,10 @@ const operations = {
 				}
 			}
 		]
-	});
+	};
 
+	const Program = new Cliy();
+	await Program.setup(option);
 	await Program.run(process.argv);
 
-}()).catch(function (error) {
-	console.error(error.stack);
-});
+}()).catch(console.error);

@@ -5,14 +5,14 @@ export default {
 	component: {
 		name: 'r-index',
 		model: {
-			dynamic: 'hello world'
+			text: 'hello world'
 		},
 		created: function () {
-			console.log('created');
+			console.log('index route created');
 		},
 		template: `
 			<h2>Index</h2>
-			<h3 o-text="dynamic"></h3>
+			<h3 o-text="text"></h3>
 		`
 	}
 }

@@ -1,5 +1,3 @@
-'use strict';
-
 // TODO need to test
 
 const END_TAG = /^<\/([-A-Za-z0-9_]+)[^>]*>/;
@@ -39,11 +37,14 @@ module.exports = {
 		]
 	},
 
-	is: function (type, name) {
-		return this.types[type].indexOf(name) !== -1;
+	is (type, name) {
+		const self = this;
+		return self.types[type].indexOf(name) !== -1;
 	},
 
-	createTagStart: function (tag, attributes) {
+	createTagStart (tag, attributes) {
+		const self = this;
+
 		let result = `<${tag}`;
 
 		for (let attribute of attributes) {
@@ -59,22 +60,24 @@ module.exports = {
 		return result;
 	},
 
-	parseStartTag: function (data, tag, name, rest, unary) {
+	parseStartTag (data, tag, name, rest, unary) {
+		const self = this;
+
 		name = name.toLowerCase();
 
-		if (this.is('BLOCK', name)) {
+		if (self.is('BLOCK', name)) {
 
-			while ( data.stack.last() && this.is('INLINE', data.stack.last()) ) {
-				this.parseEndTag(data, '', data.stack.last());
+			while ( data.stack.last() && self.is('INLINE', data.stack.last()) ) {
+				self.parseEndTag(data, '', data.stack.last());
 			}
 
 		}
 
-		if ( this.is('CLOSE_SELF', name) && data.stack.last() === name ) {
-			this.parseEndTag(data, '', name);
+		if ( self.is('CLOSE_SELF', name) && data.stack.last() === name ) {
+			self.parseEndTag(data, '', name);
 		}
 
-		unary = this.is('EMPTY', name) || !!unary;
+		unary = self.is('EMPTY', name) || !!unary;
 
 		if (!unary) {
 			data.stack.push(name);
@@ -88,7 +91,7 @@ module.exports = {
 				var value = arguments[2] ? arguments[2] :
 					arguments[3] ? arguments[3] :
 					arguments[4] ? arguments[4] :
-					this.is('FILL_ATTRIBUTES', name) ? name : '';
+					self.is('FILL_ATTRIBUTES', name) ? name : '';
 
 				attributes.push({
 					name: name,
@@ -106,7 +109,9 @@ module.exports = {
 
 	},
 
-	parseEndTag: function (data, tag, name) {
+	parseEndTag (data, tag, name) {
+		const self = this;
+
 		let position;
 
 		// If no tag name is provided, clean shop
@@ -144,7 +149,8 @@ module.exports = {
 
 	},
 
-	html: function (data) {
+	parse (data) {
+		const self = this;
 
 		data.stack = [];
 		data.last = data.html;
@@ -162,7 +168,7 @@ module.exports = {
 			let index, match;
 
 			// Make sure we are not in a script or style element
-			if ( !data.stack.last() || !this.is('SPECIAL', data.stack.last()) ) {
+			if ( !data.stack.last() || !self.is('SPECIAL', data.stack.last()) ) {
 
 				// Comment
 				if (data.html.indexOf('<!--') === 0) {
@@ -184,7 +190,7 @@ module.exports = {
 
 					if (match) {
 						data.html = data.html.substring(match[0].length);
-						match[0].replace(END_TAG, this.parseEndTag.bind(this, data));
+						match[0].replace(END_TAG, self.parseEndTag.bind(self, data));
 						isChars = false;
 					}
 
@@ -194,7 +200,7 @@ module.exports = {
 
 					if (match) {
 						data.html = data.html.substring(match[0].length);
-						match[0].replace(START_TAG, this.parseStartTag.bind(this, data));
+						match[0].replace(START_TAG, self.parseStartTag.bind(self, data));
 						isChars = false;
 					}
 
@@ -225,7 +231,7 @@ module.exports = {
 					return '';
 				});
 
-				this.parseEndTag(data, '', data.stack.last());
+				self.parseEndTag(data, '', data.stack.last());
 			}
 
 			if (data.html === data.last) {
@@ -236,8 +242,7 @@ module.exports = {
 		}
 
 		// Clean up any remaining tags
-		this.parseEndTag(data);
-
+		self.parseEndTag(data);
 	}
 
 };
