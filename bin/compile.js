@@ -24,19 +24,26 @@ module.exports = async function (data) {
 		const polyData = Fs.readFileSync(polyPath, 'utf8');
 		window.eval(polyData);
 
+		window.PATH_BASE = folder;
 		window.scroll = function () {};
 		window.customElements = { define: function () {} };
 		window.HTMLUnknownElement = Object.create(window.Element.prototype, {});
 	};
 
 	class ResourceLoader extends Jsdom.ResourceLoader {
-
 		fetch(url, options) {
-			url = url.slice(7);
-			url = url.replace(folder, '');
+
+			if (url.slice(0, 'file://'.length) === 'file://') {
+				url = url.slice('file://'.length);
+			}
+
+			if (url.slice(0, folder.length) === folder) {
+				url = url.slice(folder.length);
+			}
+
 			url = Path.join(folder, url);
-			// console.log(url);
-			return super.fetch('file://' + url, options);
+
+			return super.fetch(`file://${url}`, options);
 		}
 	}
 
@@ -45,62 +52,56 @@ module.exports = async function (data) {
 	const dom = { window } = await Jsdom.JSDOM.fromFile(file, {
 		resources,
 		beforeParse,
-		// resources: 'usable',
-		pretendToBeVisual: true,
+		url: `file://${folder}/`,
+		userAgent: 'node.js',
+		contentType: 'text/html',
 		runScripts: 'dangerously',
-		url: `file://${folder}/`
+		pretendToBeVisual: true,
 	});
 
 	const scripts = Array.from(window.document.querySelectorAll('script'));
 
 	const oxeScript = scripts.find(function (script) {
-		return script.src.includes('oxe.js') || script.src.includes('oxe.min.js');
+		return script.src.includes('oxe');
 	});
 
 	let routePosition = 0;
 
 	const afterRoute = function () {
 		const component = window.Oxe.location.route.component;
+		console.log(component);
 
-		if (!('element' in component)) {
-			component.element = window.document.querySelector(component.name);
-		}
+		// if (!('element' in component)) {
+		// 	component.element = window.document.querySelector(component.name);
+		// }
 
-		const scope = component.name + '-' + component.count++;
+		// const scope = component.name + '-' + component.count++;
 
-		component.element.scope = scope;
+		// component.element.scope = scope;
 
-		window.Oxe.component.render(component.element, component);
-		window.Oxe.binder.bind(component.element, component.element, component.element.scope);
+		// window.Oxe.component.render(component.element, component);
+		// window.Oxe.binder.bind(component.element, component.element, component.element.scope);
 
-		// console.log(dom.serialize());
+		setTimeout(function () {
+			console.log(dom.serialize());
+		},  1000);
 
-		const route = window.Oxe.router.data[++routePosition];
+		// const route = window.Oxe.router.data[++routePosition];
+		//
+		// if (route) {
+		// 	window.Oxe.router.route(route.path);
+		// }
 
-		if (route) {
-			window.Oxe.router.route(route.path);
-		}
-
-		// console.log(window.Oxe.router.data);
-		// console.log(window.Oxe.binder.data[component.element.scope]);
 	};
 
 	const afterLoad = function () {
-		window.Oxe.loader.type.js = 'es';
 
-		window.Oxe.general.setup({
-			base: folder + '/'
+		window.Oxe.router.on('route:before', function () {
+			// console.log('Oxe.location', window.Oxe.location);
 		});
-
-		// console.log(window.document.querySelector('base').href);
-
-		// window.Oxe.router.on('route:before', function () {
-		// 	console.log(window.Oxe.location);
-		// });
 
 		window.Oxe.router.on('route:after', afterRoute);
 	};
 
 	oxeScript.addEventListener('load', afterLoad);
-
 };
