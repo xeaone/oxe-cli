@@ -30,6 +30,6 @@
 		"servey": "^5.2.4"
 	},
 	"devDependencies": {
-		"oxe": "^4.0.8"
+		"oxe": "^4.8.1"
 	}
 }
