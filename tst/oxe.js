@@ -2181,6 +2181,7 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
         }
 
         url = Path.normalize(url);
+		url = Path.join(Path.base, url);
 
         if (url in this.data) {
           return $return(this.data[url]);
@@ -2357,6 +2358,7 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
       }
     },
     define: function define(options) {
+		console.log('define');
       var self = this;
       if (!options.name) throw new Error('Oxe.component.define - requires name');
       if (options.name in self.data) throw new Error('Oxe.component.define - component previously defined');

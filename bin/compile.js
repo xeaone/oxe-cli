@@ -67,24 +67,46 @@ module.exports = async function (data) {
 
 	let routePosition = 0;
 
-	const afterRoute = function () {
+	const route = function () {
 		const component = window.Oxe.location.route.component;
-		console.log(component);
 
-		// if (!('element' in component)) {
-		// 	component.element = window.document.querySelector(component.name);
-		// }
+		if ('element' in component === false) {
+			component.element = window.document.querySelector(component.name);
+	        Object.defineProperties(component.element, {
+				created:{
+					value: false,
+					enumerable: true,
+					configurable: true
+				},
+				scope: {
+				enumerable: true,
+					value: component.name + '-' + component.count++
+				},
+				model: {
+					enumerable: true,
+					get: function () {
+						return  window.Oxe.model.get(this.scope);
+					},
+					set: function (data) {
+						data = data && typeof data === 'object' ? data : {};
+						return  window.Oxe.model.set(this.scope, data);
+					}
+				},
+				methods: {
+					enumerable: true,
+					get: function () {
+						return  window.Oxe.methods.get(this.scope);
+					}
+				}
+			});
+	        // window.Oxe.model.set(component.element.scope, component.model);
+	        // window.Oxe.methods.set(component.element.scope, component.methods);
+		}
 
-		// const scope = component.name + '-' + component.count++;
-
-		// component.element.scope = scope;
-
-		// window.Oxe.component.render(component.element, component);
+		window.Oxe.component.render(component.element, component);
 		// window.Oxe.binder.bind(component.element, component.element, component.element.scope);
 
-		setTimeout(function () {
-			console.log(dom.serialize());
-		},  1000);
+		console.log(dom.serialize());
 
 		// const route = window.Oxe.router.data[++routePosition];
 		//
@@ -94,14 +116,6 @@ module.exports = async function (data) {
 
 	};
 
-	const afterLoad = function () {
-
-		window.Oxe.router.on('route:before', function () {
-			// console.log('Oxe.location', window.Oxe.location);
-		});
-
-		window.Oxe.router.on('route:after', afterRoute);
-	};
-
-	oxeScript.addEventListener('load', afterLoad);
+	const load = function () { window.Oxe.router.on('route:after', route); };
+	oxeScript.addEventListener('load', load);
 };
