@@ -51,9 +51,6 @@ module.exports = async function (data) {
 		url: `file://${folder}/`
 	});
 
-	// console.log(JSON.stringify(window.location, null, '\t'));
-	// console.log(window.document.querySelector('base').href);
-
 	const scripts = Array.from(window.document.querySelectorAll('script'));
 
 	const oxeScript = scripts.find(function (script) {
@@ -92,7 +89,6 @@ module.exports = async function (data) {
 		window.Oxe.loader.type.js = 'es';
 
 		window.Oxe.general.setup({
-			// base: folder
 			base: folder + '/'
 		});
 
