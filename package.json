@@ -7,7 +7,7 @@
 	},
 	"scripts": {
 		"t": "node bin -s tst",
-		"c": "node bin -c tst/src tst/dev"
+		"c": "rm -r tst/dev && mkdir tst/dev && node bin -c tst/src tst/dev"
 	},
 	"repository": {
 		"type": "git",

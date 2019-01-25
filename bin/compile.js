@@ -29,6 +29,10 @@ module.exports = async function (data) {
 		const polyData = Fs.readFileSync(polyPath, 'utf8');
 		window.eval(polyData);
 
+		// const polyTwoPath = Path.join(__dirname, '../node_modules/oxe/dst/poly.min.js');
+		// const polyTwoData = Fs.readFileSync(polyTwoPath, 'utf8');
+		// window.eval(polyTwoData);
+
 		window.scroll = function () {};
 		window.customElements = { define: function () {} };
 		window.HTMLUnknownElement = Object.create(window.Element.prototype, {});
@@ -84,6 +88,7 @@ module.exports = async function (data) {
 
 		if ('element' in component === false) {
 			component.element = window.document.querySelector(component.name);
+
 	        Object.defineProperties(component.element, {
 				created:{
 					value: false,
@@ -111,12 +116,13 @@ module.exports = async function (data) {
 					}
 				}
 			});
-	        // window.Oxe.model.set(component.element.scope, component.model);
-	        // window.Oxe.methods.set(component.element.scope, component.methods);
+
+	        window.Oxe.model.set(component.element.scope, component.model);
+	        window.Oxe.methods.set(component.element.scope, component.methods);
 		}
 
 		window.Oxe.component.render(component.element, component);
-		// window.Oxe.binder.bind(component.element, component.element, component.element.scope);
+		window.Oxe.binder.bind(component.element, component.element, component.element.scope);
 
 		baseTag.href = baseUserHref;
 
