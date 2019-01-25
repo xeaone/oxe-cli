@@ -73,13 +73,12 @@ const io = async function (argument, values) {
 					// operations.transpile
 				// ],
 				method: async function (argument, values) {
-					const data = await i(argument, values);
-					// const data = await io(argument, values);
+					const data = await io(argument, values);
 
 					await Compile(data);
 
 					console.log(`\nOxe - Compiling`);
-					// console.log(`\nOxe - Compiled: from ${data.input} to ${data.output}`);
+					console.log(`\nOxe - Compiled: from ${data.input} to ${data.output}`);
 				}
 			},
 			// {
@@ -128,8 +127,8 @@ const io = async function (argument, values) {
 				method: async function (argument, values) {
 					const data = await i(argument, values);
 					const server = await Serve(data);
-					console.log('\nOxe Serving\n');
-					console.log(`Served: ${server.hostname}:${server.port}`);
+					console.log('\nOxe - Serving');
+					console.log(`\nOxe - Served: ${server.hostname}:${server.port}`);
 				}
 			}
 		]

@@ -6,7 +6,8 @@
 		"oxe": "bin/index.js"
 	},
 	"scripts": {
-		"t": "node bin -s tst"
+		"t": "node bin -s tst",
+		"c": "node bin -c tst/src tst/dev"
 	},
 	"repository": {
 		"type": "git",
@@ -30,6 +31,6 @@
 		"servey": "^5.2.4"
 	},
 	"devDependencies": {
-		"oxe": "^4.8.1"
+		"oxe": "^4.9.2"
 	}
 }

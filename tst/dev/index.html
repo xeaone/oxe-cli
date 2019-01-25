@@ -1,0 +1,32 @@
+<!DOCTYPE html><html><head>
+
+	<title>index</title>
+
+	<base href="/">
+
+	<script src="./oxe.js" defer=""></script>
+	<script src="/index.js" defer=""></script>
+
+<style type="text/css">
+	o-router, o-router > :first-child {
+		display: block;
+		animation: o-transition 150ms ease-in-out;
+	}
+	@keyframes o-transition {
+		0% { opacity: 0; }
+		100% { opacity: 1; }
+	}
+</style></head>
+<body>
+
+	<a href="/">Root</a><br>
+	<a href="/about">About</a><br>
+
+	<o-router><r-index o-scope="r-index-0">
+			<h2>Index</h2>
+			<h3 o-text="text"></h3>
+		</r-index></o-router>
+
+
+
+</body></html>

@@ -7,24 +7,28 @@ const Jsdom = require('jsdom');
 const Stat = Util.promisify(Fs.stat);
 const ReadFile = Util.promisify(Fs.readFile);
 const WriteFile = Util.promisify(Fs.writeFile);
+const WriteFolder = Util.promisify(Fs.mkdir);
 
 module.exports = async function (data) {
 
-	if (!data.input) throw new Error('oxe - requires input argument');
-
 	const input = Path.resolve(data.input);
+	const output = Path.resolve(data.output);
+
+	if (!Fs.existsSync(input)) throw new Error('Oxe Compile - input path does not exist');
+	if (!Fs.existsSync(output)) throw new Error('Oxe Compile - output path does not exist');
+
 	const stat = await Stat(input);
 
 	const folder = stat.isDirectory() ? input : Path.dirname(input);
 	const file = stat.isFile() ? input : Path.join(input, 'index.html');
+	const baseHref = `file://${folder}/`;
 
 	const beforeParse = function (window) {
 
-		const polyPath = Path.join(__dirname, 'poly.js');
+		const polyPath = Path.join(__dirname, '../lib/', 'poly.js');
 		const polyData = Fs.readFileSync(polyPath, 'utf8');
 		window.eval(polyData);
 
-		window.PATH_BASE = folder;
 		window.scroll = function () {};
 		window.customElements = { define: function () {} };
 		window.HTMLUnknownElement = Object.create(window.Element.prototype, {});
@@ -52,12 +56,20 @@ module.exports = async function (data) {
 	const dom = { window } = await Jsdom.JSDOM.fromFile(file, {
 		resources,
 		beforeParse,
-		url: `file://${folder}/`,
+		url: baseHref,
 		userAgent: 'node.js',
 		contentType: 'text/html',
 		runScripts: 'dangerously',
 		pretendToBeVisual: true,
 	});
+
+	const baseTag = window.document.querySelector('base');
+
+	if (!baseTag) throw new Error('Oxe Compile - requires base tag');
+
+	const baseUserHref = baseTag.getAttribute('href');
+
+	baseTag.href = baseHref;
 
 	const scripts = Array.from(window.document.querySelectorAll('script'));
 
@@ -106,13 +118,20 @@ module.exports = async function (data) {
 		window.Oxe.component.render(component.element, component);
 		// window.Oxe.binder.bind(component.element, component.element, component.element.scope);
 
-		console.log(dom.serialize());
+		baseTag.href = baseUserHref;
 
-		// const route = window.Oxe.router.data[++routePosition];
-		//
-		// if (route) {
-		// 	window.Oxe.router.route(route.path);
-		// }
+		const outputRouteFolder = Path.join(output, window.Oxe.location.route.path);
+
+		Promise.resolve().then(function () {
+			if (window.Oxe.location.route.path === '/') return;
+			return WriteFolder(outputRouteFolder);
+		}).then(function () {
+			return WriteFile(Path.join(outputRouteFolder, 'index.html'), dom.serialize(), 'utf8');
+		}).then(function () {
+			baseTag.href = baseHref;
+			const route = window.Oxe.router.data[++routePosition];
+			if (route) window.Oxe.router.route(route.path);
+		}).catch(console.error);
 
 	};
 
