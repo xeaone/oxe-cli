@@ -1,6 +1,6 @@
 {
 	"name": "oxe-cli",
-	"version": "1.1.17",
+	"version": "2.0.0",
 	"description": "Oxe command line interface program for Oxe applications.",
 	"bin": {
 		"oxe": "bin/index.js"
@@ -31,6 +31,6 @@
 		"servey": "^5.2.4"
 	},
 	"devDependencies": {
-		"oxe": "^4.9.2"
+		"oxe": "^4.10.1"
 	}
 }

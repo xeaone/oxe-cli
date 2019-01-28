@@ -17,9 +17,9 @@ Oxe command line interface program for Oxe applications.
 - `-v, --version`
 
 - `-c, --compile <input> <output>` Compiles to a static project.
-	- `-m, --minify`
-	- `-c, --comment`
-	- `-t, --transpile`
+	<!-- - `-m, --minify` -->
+	<!-- - `-c, --comment` -->
+	<!-- - `-t, --transpile` -->
 
 - `-b, --bundle <input> <output>` Bundles a project.
 	- `-m, --minify`
