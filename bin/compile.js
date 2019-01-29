@@ -1,5 +1,6 @@
 const Vm = require('vm');
 const Fs = require('fs');
+const Url = require('url');
 const Util = require('util');
 const Path = require('path');
 const Jsdom = require('jsdom');
@@ -9,10 +10,92 @@ const ReadFile = Util.promisify(Fs.readFile);
 const WriteFile = Util.promisify(Fs.writeFile);
 const WriteFolder = Util.promisify(Fs.mkdir);
 
-module.exports = async function (data) {
+const LoadOxeScript = async function (window, path) {
+	const query = window.document.querySelectorAll('script');
+	const scripts = Array.from(query);
 
-	const input = Path.resolve(data.input);
-	const output = Path.resolve(data.output);
+	const oxeScript = scripts.find(function (script) {
+		return script.src.includes('oxe');
+	});
+
+	const indexScript = scripts.find(function (script) {
+		return script.src.includes('index');
+	});
+
+	if (!oxeScript) throw new Error('Oxe Compile - oxe script tag required');
+
+	const oxePath = oxeScript.getAttribute('src');
+	const oSetup = oxeScript.getAttribute('o-setup');
+
+	if (!indexScript && !oSetup) throw new Error('Oxe Compile - index script tag or o-setup required');
+
+	console.log('oxe:', Path.join(path, oxePath));
+	const oxeData = await ReadFile(Path.join(path, oxePath), 'utf8');
+
+	window.eval(oxeData);
+
+	if (oSetup) {
+		const indexPath = oSetup.split(/\s+|\s*,+\s*/)[0];
+		// console.log('index:', Path.join(path, indexPath));
+	} else {
+		const indexPath = indexScript.getAttribute('src');
+		console.log('index:', Path.join(path, indexPath));
+		const indexData = await ReadFile(Path.join(path, indexPath), 'utf8');
+		window.eval(indexData);
+	}
+
+	return new Promise(function (resolve, reject) {
+		window.Oxe.router.on('route:after', resolve);
+	});
+
+};
+
+const OxeRouteRender = function () {
+	const component = window.Oxe.location.route.component;
+
+	if ('element' in component === false) {
+		component.element = window.document.querySelector(component.name);
+
+        Object.defineProperties(component.element, {
+			created:{
+				value: false,
+				enumerable: true,
+				configurable: true
+			},
+			scope: {
+			enumerable: true,
+				value: component.name + '-' + component.count++
+			},
+			model: {
+				enumerable: true,
+				get: function () {
+					return  window.Oxe.model.get(this.scope);
+				},
+				set: function (data) {
+					data = data && typeof data === 'object' ? data : {};
+					return  window.Oxe.model.set(this.scope, data);
+				}
+			},
+			methods: {
+				enumerable: true,
+				get: function () {
+					return  window.Oxe.methods.get(this.scope);
+				}
+			}
+		});
+
+        window.Oxe.model.set(component.element.scope, component.model);
+        window.Oxe.methods.set(component.element.scope, component.methods);
+	}
+
+	window.Oxe.component.render(component.element, component);
+	window.Oxe.binder.bind(component.element, component.element, component.element.scope);
+};
+
+module.exports = async function (input, output, root) {
+
+	input = Path.resolve(process.cwd(), input);
+	output = Path.resolve(process.cwd(), output);
 
 	if (!Fs.existsSync(input)) throw new Error('Oxe Compile - input path does not exist');
 	if (!Fs.existsSync(output)) throw new Error('Oxe Compile - output path does not exist');
@@ -21,7 +104,17 @@ module.exports = async function (data) {
 
 	const folder = stat.isDirectory() ? input : Path.dirname(input);
 	const file = stat.isFile() ? input : Path.join(input, 'index.html');
-	const baseHref = `file://${folder}/`;
+
+	if (root) {
+		root = Path.resolve(process.cwd(), root);
+		if (!Fs.existsSync(root)) throw new Error('Oxe Compile - root path does not exist');
+	} else {
+		root = input;
+	}
+
+	console.log(input);
+	console.log(output);
+	console.log(root);
 
 	const beforeParse = function (window) {
 
@@ -38,109 +131,44 @@ module.exports = async function (data) {
 		window.HTMLUnknownElement = Object.create(window.Element.prototype, {});
 	};
 
-	class ResourceLoader extends Jsdom.ResourceLoader {
-		fetch(url, options) {
-
-			if (url.slice(0, 'file://'.length) === 'file://') {
-				url = url.slice('file://'.length);
-			}
-
-			if (url.slice(0, folder.length) === folder) {
-				url = url.slice(folder.length);
-			}
-
-			url = Path.join(folder, url);
-
-			return super.fetch(`file://${url}`, options);
-		}
-	}
-
-	const resources = new ResourceLoader();
-
 	const dom = { window } = await Jsdom.JSDOM.fromFile(file, {
-		resources,
 		beforeParse,
-		url: baseHref,
+		url: `file://${input}/`,
 		userAgent: 'node.js',
 		contentType: 'text/html',
-		runScripts: 'dangerously',
-		pretendToBeVisual: true,
+		runScripts: 'outside-only',
+		pretendToBeVisual: true
 	});
 
 	const baseTag = window.document.querySelector('base');
-
 	if (!baseTag) throw new Error('Oxe Compile - requires base tag');
-
 	const baseUserHref = baseTag.getAttribute('href');
-
+	const baseHref = `${input}/`;
 	baseTag.href = baseHref;
 
-	const scripts = Array.from(window.document.querySelectorAll('script'));
+	console.log('base:', baseTag.href);
 
-	const oxeScript = scripts.find(function (script) {
-		return script.src.includes('oxe');
-	});
+	await LoadOxeScript(window, input);
 
-	let routePosition = 0;
+	for (const route of window.Oxe.router.data) {
+		console.log('route:', route.path);
 
-	const route = function () {
-		const component = window.Oxe.location.route.component;
-
-		if ('element' in component === false) {
-			component.element = window.document.querySelector(component.name);
-
-	        Object.defineProperties(component.element, {
-				created:{
-					value: false,
-					enumerable: true,
-					configurable: true
-				},
-				scope: {
-				enumerable: true,
-					value: component.name + '-' + component.count++
-				},
-				model: {
-					enumerable: true,
-					get: function () {
-						return  window.Oxe.model.get(this.scope);
-					},
-					set: function (data) {
-						data = data && typeof data === 'object' ? data : {};
-						return  window.Oxe.model.set(this.scope, data);
-					}
-				},
-				methods: {
-					enumerable: true,
-					get: function () {
-						return  window.Oxe.methods.get(this.scope);
-					}
-				}
-			});
-
-	        window.Oxe.model.set(component.element.scope, component.model);
-	        window.Oxe.methods.set(component.element.scope, component.methods);
-		}
-
-		window.Oxe.component.render(component.element, component);
-		window.Oxe.binder.bind(component.element, component.element, component.element.scope);
+		await window.Oxe.router.route(route.path);
+		await OxeRouteRender(window);
 
 		baseTag.href = baseUserHref;
 
-		const outputRouteFolder = Path.join(output, window.Oxe.location.route.path);
+		const outputFolder = Path.join(output, window.Oxe.location.route.path);
 
-		Promise.resolve().then(function () {
-			if (window.Oxe.location.route.path === '/') return;
-			return WriteFolder(outputRouteFolder);
-		}).then(function () {
-			return WriteFile(Path.join(outputRouteFolder, 'index.html'), dom.serialize(), 'utf8');
-		}).then(function () {
-			baseTag.href = baseHref;
-			const route = window.Oxe.router.data[++routePosition];
-			if (route) window.Oxe.router.route(route.path);
-		}).catch(console.error);
+		if (!Fs.existsSync(outputFolder)) {
+			await WriteFolder(outputFolder);
+		}
 
-	};
+		const outputFile = Path.join(outputFolder, 'index.html');
 
-	const load = function () { window.Oxe.router.on('route:after', route); };
-	oxeScript.addEventListener('load', load);
+		await WriteFile(outputFile, dom.serialize(), 'utf8');
+
+		baseTag.href = baseHref;
+	}
+
 };
