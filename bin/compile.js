@@ -92,7 +92,7 @@ const OxeRouteRender = function () {
 	window.Oxe.binder.bind(component.element, component.element, component.element.scope);
 };
 
-module.exports = async function (input, output, root) {
+module.exports = async function (input, output) {
 
 	input = Path.resolve(process.cwd(), input);
 	output = Path.resolve(process.cwd(), output);
@@ -104,17 +104,6 @@ module.exports = async function (input, output, root) {
 
 	const folder = stat.isDirectory() ? input : Path.dirname(input);
 	const file = stat.isFile() ? input : Path.join(input, 'index.html');
-
-	if (root) {
-		root = Path.resolve(process.cwd(), root);
-		if (!Fs.existsSync(root)) throw new Error('Oxe Compile - root path does not exist');
-	} else {
-		root = input;
-	}
-
-	console.log(input);
-	console.log(output);
-	console.log(root);
 
 	const beforeParse = function (window) {
 

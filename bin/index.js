@@ -67,27 +67,16 @@ const io = async function (argument, values) {
 				key: 'c',
 				name: 'compile',
 				description: 'Compiles to a static project.',
-				operations: [
-					{
-						key: 'r',
-						name: 'root',
-						method: function (argument) {
-							return argument.split(' ')[2];
-						}
-					}
-					// operations.minify,
-					// operations.comments,
-					// operations.transpile
-				],
 				method: async function (argument, values) {
 					const args = argument ? argument.split(' ') : [];
 
 					if (!args[0]) throw new Error('Missing input path parameter');
 					if (!args[1]) throw new Error('Missing output path parameter');
 
-					await Compile(args[0], args[1], values.root);
-
 					console.log(`\nOxe - Compiling`);
+
+					await Compile(args[0], args[1]);
+					
 					console.log(`\nOxe - Compiled: from ${args[0]} to ${args[1]}`);
 				}
 			},
