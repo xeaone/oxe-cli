@@ -1,6 +1,6 @@
 {
 	"name": "oxe-cli",
-	"version": "2.1.0",
+	"version": "2.2.0",
 	"description": "Oxe command line interface program for Oxe applications.",
 	"bin": {
 		"oxe": "bin/index.js"

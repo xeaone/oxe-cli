@@ -137,6 +137,10 @@ module.exports = async function (input, output) {
 
 	console.log('base:', baseTag.href);
 
+	const oxeMetaElement = window.document.createElement('meta');
+	oxeMetaElement.setAttribute('name', 'oxe');
+	oxeMetaElement.setAttribute('content', 'compiled');
+
 	await LoadOxeScript(window, input);
 
 	for (const route of window.Oxe.router.data) {
@@ -155,8 +159,11 @@ module.exports = async function (input, output) {
 
 		const outputFile = Path.join(outputFolder, 'index.html');
 
+		window.document.head.insertBefore(oxeMetaElement, window.document.head.firstElementChild);
+
 		await WriteFile(outputFile, dom.serialize(), 'utf8');
 
+		window.document.head.removeChild(oxeMetaElement);
 		baseTag.href = baseHref;
 	}
 
