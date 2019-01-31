@@ -88,8 +88,29 @@ const OxeRouteRender = function () {
         window.Oxe.methods.set(component.element.scope, component.methods);
 	}
 
-	window.Oxe.component.render(component.element, component);
-	window.Oxe.binder.bind(component.element, component.element, component.element.scope);
+	component.element.setAttribute('o-scope', component.element.scope);
+
+	const template = window.document.createElement('template');
+	const style = window.Oxe.component.renderStyle(component.style, component.element.scope);
+
+	if (typeof component.template === 'string') {
+		template.innerHTML = style + component.template;
+	} else {
+		template.innerHTML = style;
+		template.appendChild(component.template);
+	}
+
+	const clone = window.document.importNode(template.content, true);
+	// cant bind each
+	// window.Oxe.inder.bind(clone, element, element.scope);
+
+	if (component.shadow) throw new Error('Oxe Compile - component shadow not permitted');
+	
+	window.Oxe.component.renderSlot(clone, component.element);
+	component.element.appendChild(clone);
+
+	// cant bind each
+	// window.Oxe.component.render(component.element, component);
 };
 
 module.exports = async function (input, output) {
